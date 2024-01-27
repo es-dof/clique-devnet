@@ -7,7 +7,7 @@ RUN apt-get update && \
     rm -fr /var/lib/apt/lists/* && \
     rm -rf /etc/apt/sources.list.d/*
 
-RUN npm install --global --quiet npm truffle ganache
+RUN npm install --global --quiet truffle ganache
 
 FROM base as ganache
 
@@ -15,4 +15,4 @@ RUN mkdir -p /home
 WORKDIR /home
 EXPOSE 8545
 
-ENTRYPOINT ["ganache", "--host 0.0.0.0"]
+ENTRYPOINT ["ganache", "--server.host='0.0.0.0'"]
