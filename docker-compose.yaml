@@ -1,0 +1,8 @@
+version: "3.4"
+services:
+  ganache:
+    build:
+      context: .
+      target: ganache
+    ports:
+      - 8545:8545
