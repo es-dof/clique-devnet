@@ -6,3 +6,11 @@ services:
       target: ganache
     ports:
       - 8545:8545
+  clique-sim-server:
+    build:
+      context: https://github.com/clique-cb/simple-eigentrust#master:python
+      target: sim-server
+    args:
+      PORT: 8555
+    ports:
+      - 8555:8555
