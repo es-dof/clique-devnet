@@ -35,8 +35,8 @@ services:
       - --monitoring-host=0.0.0.0
       - --execution-endpoint=http://execution-node:8551
       - --jwt-secret=/root/secrets/jwt.hex
-      - --checkpoint-sync-url=https://holesky.beaconstate.info
-      - --genesis-beacon-api-url=https://holesky.beaconstate.info
+      - --checkpoint-sync-url=${BEACON_API_URL}
+      - --genesis-beacon-api-url=${BEACON_API_URL}
       - --suggested-fee-recipient=${SUGGESTED_FEE_RECIPIENT}
       - --holesky
     depends_on:
