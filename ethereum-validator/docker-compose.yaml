@@ -36,6 +36,7 @@ services:
       - --jwt-secret=/root/secrets/jwt.hex
       - --checkpoint-sync-url=https://holesky.beaconstate.info
       - --genesis-beacon-api-url=https://holesky.beaconstate.info
+      - --suggested-fee-recipient=${SUGGESTED_FEE_RECIPIENT}
       - --holesky
     depends_on:
       - execution-node
