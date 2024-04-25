@@ -6,6 +6,10 @@ volumes:
     driver: local
   beacon-node-data:
     driver: local
+  validator-node-data:
+    driver: local
+  validator-wallet:
+    driver: local
 networks:
   ethereum-validator:
 services:
@@ -17,7 +21,15 @@ services:
     volumes:
       - execution-node-data:/root/.ethereum
       - shared-secrets:/root/secrets
-    command: geth --holesky --authrpc.addr execution-node --authrpc.port 8551 --authrpc.vhosts execution-node --http --http.api eth,net,engine,admin --authrpc.jwtsecret /root/secrets/jwt.hex
+    command:
+      - geth
+      - --holesky
+      - --authrpc.addr execution-node
+      - --authrpc.port 8551
+      - --authrpc.vhosts execution-node
+      - --http --http.api eth,net,engine,admin
+      - --authrpc.jwtsecret /root/secrets/jwt.hex
+
   beacon-node:
     image: gcr.io/prysmaticlabs/prysm/beacon-chain:stable
     restart: unless-stopped
@@ -28,7 +40,7 @@ services:
       - beacon-node-data:/data
       - shared-secrets:/root/secrets
     command:
-      - --accept-terms-of-use
+      - --holesky
       - --datadir=/data
       - --rpc-host=0.0.0.0
       - --grpc-gateway-host=0.0.0.0
@@ -38,6 +50,30 @@ services:
       - --checkpoint-sync-url=${BEACON_API_URL}
       - --genesis-beacon-api-url=${BEACON_API_URL}
       - --suggested-fee-recipient=${SUGGESTED_FEE_RECIPIENT}
-      - --holesky
+      - --accept-terms-of-use
     depends_on:
       - execution-node
+
+  validator-node:
+    image: gcr.io/prysmaticlabs/prysm/validator:stable
+    restart: unless-stopped
+    volumes:
+      - validator-node-data:/validatorDB
+      - validator-wallet:/wallet
+    command:
+      - --beacon-rpc-provider=beacon-node:4000
+      - --wallet-dir=/wallet
+      - --datadir=/validatorDB
+      - --suggested-fee-recipient=${SUGGESTED_FEE_RECIPIENT}
+      - --accept-terms-of-use
+    depends_on:
+      - execution-node
+      - beacon-node
+
+  validator-import:
+    image: gcr.io/prysmaticlabs/prysm/validator:stable
+    profiles: ["import-keys"]
+    volumes:
+      - ./validator_keys:/keys
+      - validator-wallet:/wallet
+    command: accounts import --keys-dir=/keys --wallet-dir=/wallet --accept-terms-of-use
